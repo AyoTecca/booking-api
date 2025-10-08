@@ -1,41 +1,67 @@
+Absolutely! Here’s a fully ready-to-use `README.md` for your **Booking API** that you can just drop into your project root. It’s clean, detailed, and ready for someone to install and run locally without Docker.
+
+````markdown
 # Booking API
 
-Backend API for event booking with seat limits, authentication, and admin management.
+A backend API for event booking with seat limits, user authentication, and admin-controlled event management. Users can register, login, browse events, reserve seats, and cancel bookings, while admins can manage events and view booking availability.
 
-## 🚀 Tech Stack
+---
+
+## Tech Stack
 
 - Node.js & NestJS
-- TypeScript  
+- TypeScript
 - PostgreSQL
 - TypeORM
 - JWT Authentication
+- `class-validator` for input validation
 
-## ✨ Features
+---
 
-- User authentication (register/login)
-- Role-based access (admin/user)
-- Event management
-- Booking with seat availability
-- Soft delete for events
-- Input validation
+## Features
 
-## 📋 Prerequisites
+- **User Authentication**: Register and login with email and password.
+- **Role-Based Access Control**: Admin and user roles with restricted access to certain endpoints.
+- **Event Management**: Admins can create, update, delete, and list events.
+- **Booking Management**: Users can reserve and cancel bookings with seat availability checks.
+- **Soft Delete**: Deleted events are soft-deleted, preserving historical data.
+- **Data Validation & Error Handling**: Ensures proper request inputs and handles edge cases like duplicate bookings or full events.
+
+---
+
+## Getting Started
+
+### Prerequisites
 
 - Node.js v18+
 - npm or yarn
-- PostgreSQL
+- PostgreSQL installed locally
 
-## 🛠️ Quick Start
+### Installation
 
-# Clone and install
-git clone https://github.com/AyoTecca/booking-api.git
+1. Clone the repository:
+
+```bash
+git clone <repo-url>
 cd booking-api
+````
+
+2. Install dependencies:
+
+```bash
 npm install
+# or
+yarn install
+```
 
-# Setup database
-createdb booking_api
+3. Set up PostgreSQL:
 
-# Environment (create .env.stage.dev)
+* Create a database, e.g., `booking_api`.
+* Ensure you have a user with privileges to access this database.
+
+4. Create a `.env.stage.dev` file in the project root with the following content:
+
+```
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=your_db_username
@@ -44,73 +70,164 @@ DB_DATABASE=booking_api
 JWT_SECRET=your_jwt_secret
 STAGE=dev
 PORT=3000
+```
 
-# Run
+5. Run the application:
+
+```bash
 npm run start:dev
+# or
+yarn start:dev
+```
 
-## 🔌 Key Endpoints
+The API will be available at [http://localhost:3000](http://localhost:3000).
+
+---
+
+## API Endpoints
 
 ### Authentication
 
-# Register
-POST /auth/register
-{"email": "user@example.com", "password": "123456", "role": "user"}
+**Register**: `POST /auth/register`
 
-# Login  
-POST /auth/login
-{"email": "user@example.com", "password": "123456"}
+Request body:
 
-## Events
+```json
+{
+  "email": "user@example.com",
+  "password": "123456",
+  "role": "user"
+}
+```
 
-- `GET /api/events` - List events
-- `POST /api/events` - Create event (admin)
-- `GET /api/events/:id/availability` - Check seats
+**Login**: `POST /auth/login`
 
-## Bookings
+Request body:
 
-- `POST /api/bookings/reserve` - Reserve seats
-- `PATCH /api/bookings/:id/cancel` - Cancel booking
+```json
+{
+  "email": "user@example.com",
+  "password": "123456"
+}
+```
 
-**Auth Header:** `Authorization: Bearer <token>`
+Response:
 
-## Database Schema
+```json
+{
+  "access_token": "<JWT>"
+}
+```
+
+---
+
+### Events
+
+* **List Events**: `GET /api/events`
+* **Get Event by ID**: `GET /api/events/:id`
+* **Create Event**: `POST /api/events` (admin only)
+
+Request body:
+
+```json
+{
+  "name": "Concert",
+  "totalSeats": 100
+}
+```
+
+* **Update Event**: `PATCH /api/events/:id` (admin only)
+* **Delete Event**: `DELETE /api/events/:id` (admin only)
+* **Check Availability**: `GET /api/events/:id/availability`
+
+---
+
+### Bookings
+
+* **Reserve Booking**: `POST /api/bookings/reserve`
+
+Request body:
+
+```json
+{
+  "eventId": "<event-id>"
+}
+```
+
+User ID is automatically taken from the JWT token.
+
+* **Cancel Booking**: `PATCH /api/bookings/:id/cancel`
+
+---
+
+### Authentication Header
+
+All protected endpoints require the following header:
+
+```
+Authorization: Bearer <JWT>
+```
+
+---
+
+## Database
+
+PostgreSQL is used with TypeORM.
+
+### Entities
 
 **User**
-- id, email, password, role, bookings[]
+
+* `id`: UUID
+* `email`: unique string
+* `password`: hashed string
+* `role`: 'admin' | 'user'
+* `bookings`: OneToMany relation to bookings
 
 **Event**
-- id, name, totalSeats, bookings[], deletedAt
+
+* `id`: UUID
+* `name`: string
+* `totalSeats`: integer
+* `bookings`: OneToMany relation to bookings
+* `deletedAt`: soft-delete timestamp
 
 **Booking**
-- id, userId, eventId, isCanceled, createdAt
 
-## 🧪 Testing
+* `id`: UUID
+* `userId`: UUID
+* `eventId`: UUID
+* `isCanceled`: boolean
+* `createdAt`: timestamp
 
-Use the following cURL commands to test the API endpoints:
+---
 
-**Register a new user**
-curl -X POST http://localhost:3000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"123456","role":"user"}'
+## Testing
 
-**User login**
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"123456"}'
+Use Postman, Insomnia, or curl to test the API.
 
-Reserve a booking (Replace <token> and <event-id> with actual values)
+Example: Reserve a booking
 
+```bash
 curl -X POST http://localhost:3000/api/bookings/reserve \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"eventId":"<event-id>"}'
+-H "Authorization: Bearer <JWT>" \
+-H "Content-Type: application/json" \
+-d '{"eventId":"<event-id>"}'
+```
 
-## ⚠️ Important Notes
+Example: Check event availability
 
-**To access admin features, register a user with "role": "admin"**
+```bash
+curl http://localhost:3000/api/events/<event-id>/availability
+```
 
-**Ensure the JWT_SECRET in your environment configuration file matches the one used in your application's JwtStrategy**
+---
 
-**Events are soft-deleted; they remain in the database for historical record-keeping but become unavailable for new bookings**
+## Notes
 
-The API will be available at: http://localhost:3000
+* To test admin features, register a user with `"role": "admin"`.
+* JWT secret must match between `.env` and `JwtStrategy`.
+* Soft-deleted events cannot be booked but historical data remains intact.
+
+```
+
