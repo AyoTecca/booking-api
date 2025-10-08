@@ -28,7 +28,7 @@ Backend API for event booking with seat limits, authentication, and admin manage
 ## 🛠️ Quick Start
 
 # Clone and install
-git clone <repo-url>
+git clone https://github.com/AyoTecca/booking-api.git
 cd booking-api
 npm install
 
