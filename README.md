@@ -1,6 +1,4 @@
-Absolutely! Here’s a fully ready-to-use `README.md` for your **Booking API** that you can just drop into your project root. It’s clean, detailed, and ready for someone to install and run locally without Docker.
-
-````markdown
+````
 # Booking API
 
 A backend API for event booking with seat limits, user authentication, and admin-controlled event management. Users can register, login, browse events, reserve seats, and cancel bookings, while admins can manage events and view booking availability.
