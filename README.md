@@ -39,7 +39,7 @@ A backend API for event booking with seat limits, user authentication, and admin
 1. Clone the repository:
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/AyoTecca/booking-api.git
 cd booking-api
 ````
 
@@ -225,6 +225,4 @@ curl http://localhost:3000/api/events/<event-id>/availability
 * To test admin features, register a user with `"role": "admin"`.
 * JWT secret must match between `.env` and `JwtStrategy`.
 * Soft-deleted events cannot be booked but historical data remains intact.
-
-```
 
